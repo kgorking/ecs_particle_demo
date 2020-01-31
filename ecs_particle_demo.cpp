@@ -1,12 +1,9 @@
-﻿// ecs_particle_demo.cpp : Defines the entry point for the application.
-//
-
-#include "ecs_particle_demo.h"
+﻿#include "ecs_particle_demo.h"
+#include <ecs/ecs.h>
 
 using namespace std;
 
-int main()
-{
+int main() {
 	cout << "Hello CMake." << endl;
 	return 0;
 }
