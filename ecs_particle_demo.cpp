@@ -73,7 +73,7 @@ int main() {
         glGenBuffers(1, &vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
         //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(particle) * particles.count(), (const void*)&ecs::get_component<particle>(0), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(particle) * particles.count(), (const void*)ecs::get_component<particle>(0), GL_DYNAMIC_DRAW);
 
         const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
@@ -128,7 +128,7 @@ int main() {
             mat4x4_mul(mvp, p, m);
 
             // Copy the particle data
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * particles.count(), (const void*)&ecs::get_component<particle>(0));
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * particles.count(), (const void*)ecs::get_component<particle>(0));
 
             glUseProgram(program);
             glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*)&mvp);
