@@ -1,6 +1,6 @@
 #pragma once
 
-static constexpr int max_num_particles = 500'000;
+static constexpr int max_num_particles = 100'000;
 
 struct particle {
     float x, y;

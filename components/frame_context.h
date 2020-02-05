@@ -5,6 +5,9 @@
 struct frame_context {
 	ecs_flags(ecs::shared);
 
-	double time = 0;
-	double dt = 0;
+	float time = 0;
+	float dt = 0;
+
+	float cursor_x = 0.0;
+	float cursor_y = 0.0;
 };

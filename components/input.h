@@ -5,7 +5,7 @@ struct input {
 	ecs_flags(ecs::transient);
 
 	struct GLFWwindow* window = nullptr;
-	int key = GLFW_KEY_UNKNOWN;
+	int key = -1;
 	int scancode = 0;
 	int action = 0;
 	int mods = 0;

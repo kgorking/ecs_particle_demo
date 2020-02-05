@@ -12,23 +12,37 @@
 #include "components/input.h"
 #include "components/frame_context.h"
 
-ecs::entity global{ -1 };
+static void print_help() {
+    std::cout << "\nOptions:\n";
+    std::cout << "h: print this help\n";
+    std::cout << "v: add/remove velocity component\n";
+    std::cout << "r: reset colors\n";
+    std::cout << "s: toggle mouse spring on/off\n";
+    std::cout << "p: toggle particle painter\n";
+    std::cout << '\n';
+}
 
 static void error_callback(int error, const char* description) {
 	std::cout << "GLFW Error: " << description << '\n';
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    switch (key) {
-        case GLFW_KEY_ESCAPE:
-            if (action == GLFW_PRESS) {
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-                return;
-            }
-            break;
+    // Only react to keys that are pressed down
+    if (action != GLFW_PRESS)
+        return;
+
+    if (key == GLFW_KEY_ESCAPE) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+        return;
+    }
+    if (key == GLFW_KEY_H) {
+        print_help();
+        return;
     }
 
-    global.add(input{window, key, scancode, action, mods});
+    // Allow systems to react to the input
+    ecs::entity global{ -1 };
+    global.add(input{ window, key, scancode, action, mods });
 }
 
 int main() {
@@ -37,32 +51,31 @@ int main() {
 		return 1;
 	}
 
-    // Create 1k particles
+    // Create particles
     std::cout << "Creating " << max_num_particles << " particles.\n";
     ecs::entity_range particles{ 0, max_num_particles, [](ecs::entity_id) -> particle {
         float const x = rand() / 16384.0f - 1.0f;
         float const y = rand() / 16384.0f - 1.0f;
+        float const r = x / 2 + 0.5f;
+        float const g = y / 2 + 0.5f;
+
         return {
             x, y,
-
-            x/2+0.5f,
-            y/2+0.5f,
-            0//rand() / 32768.0f
+            r, g, 1 - r - g
         };
     }};
     particles.add<frame_context>();
-    ecs::update_systems();
+    ecs::commit_changes();
 
     // Print out the help
-    std::cout << "\nOptions:\n";
-    std::cout << "v: toggle velocity component\n";
+    print_help();
 
     // Setup opengl version
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL Triangle", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(640, 640, "ECS particle demo", NULL, NULL);
 	if (window) {
 		glfwSetKeyCallback(window, key_callback);
 		glfwMakeContextCurrent(window);
@@ -72,7 +85,6 @@ int main() {
         GLuint vertex_buffer;
         glGenBuffers(1, &vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-        //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
         glBufferData(GL_ARRAY_BUFFER, sizeof(particle) * particles.count(), (const void*)ecs::get_component<particle>(0), GL_DYNAMIC_DRAW);
 
         const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -100,27 +112,45 @@ int main() {
         glEnableVertexAttribArray(vcol_location);
         glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, r));
 
+        glPointSize(2);
+
         frame_context& frame = ecs::get_shared_component<frame_context>();
-        frame.time = glfwGetTime();
+        frame.time = static_cast<float>(glfwGetTime());
         while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
+
+            // Set up the viewport
+            int width, height;
+            glfwGetFramebufferSize(window, &width, &height);
+
+            glViewport(0, 0, width, height);
+            //glClearColor(0.2, 0.2, 0.2, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
 
             // Update the frame time
-            double const time = glfwGetTime();
+            float const time = static_cast<float>(glfwGetTime());
             frame.dt = time - frame.time;
             frame.time = time;
+
+            // Update cursor position
+            double cx = 0, cy = 0;
+            glfwGetCursorPos(window, &cx, &cy);
+            frame.cursor_x = static_cast<float>(cx / width);    // [0, 1]
+            frame.cursor_y = static_cast<float>(cy / height);
+            frame.cursor_y = 1 - frame.cursor_y;
+            frame.cursor_x -= 0.5f;      // [-0.5, 0.5]
+            frame.cursor_y -= 0.5f;
+            frame.cursor_x *= 2;        // [-1, 1]
+            frame.cursor_y *= 2;
+            frame.cursor_x = std::clamp<float>(frame.cursor_x, -1, +1);
+            frame.cursor_y = std::clamp<float>(frame.cursor_y, -1, +1);
 
             // Commit changes and run the systems
             ecs::update_systems();
 
-            //
-            // Render the particles
-            int width, height;
-            glfwGetFramebufferSize(window, &width, &height);
+
+            // Set up mvp matrix
             const float ratio = width / (float)height;
-
-            glViewport(0, 0, width, height);
-            glClear(GL_COLOR_BUFFER_BIT);
-
             mat4x4 m, p, mvp;
             mat4x4_identity(m);
             //mat4x4_rotate_Z(m, m, (float)glfwGetTime());
@@ -130,13 +160,13 @@ int main() {
             // Copy the particle data
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * particles.count(), (const void*)ecs::get_component<particle>(0));
 
+            // Draw the particles
             glUseProgram(program);
             glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*)&mvp);
             glBindVertexArray(vertex_array);
-            glDrawArrays(GL_POINTS, 0, ecs::get_component_count<particle>());
+            glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(ecs::get_component_count<particle>()));
 
             glfwSwapBuffers(window);
-            glfwPollEvents();
         }
 
         glfwDestroyWindow(window);
