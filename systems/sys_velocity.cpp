@@ -13,6 +13,9 @@ ecs::system& sys_vel_input = ecs::add_system([has_velocity = false] (input const
     if (input.key != GLFW_KEY_V)
         return;
 
+    // By removing the velocity components from the particles,
+    // other systems that depend on the velocity component
+    // will also stop running.
     ecs::entity_range particles{ 0, max_num_particles };
     if (has_velocity) {
         particles.remove<velocity>();

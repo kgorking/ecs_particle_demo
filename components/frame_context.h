@@ -10,4 +10,9 @@ struct frame_context {
 
 	float cursor_x = 0.0;
 	float cursor_y = 0.0;
+
+	// window data
+	int width = 0;
+	int height = 0;
+	float ratio = 0;
 };

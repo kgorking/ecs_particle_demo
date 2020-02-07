@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-ecs::system& sys_mouse_spring = ecs::add_system_parallel([](velocity& vel, particle const& par, frame_context const& fc) {
+static ecs::system& sys_mouse_spring = ecs::add_system_parallel([](velocity& vel, particle const& par, frame_context const& fc) {
 	float r_x = fc.cursor_x - par.x;
 	float r_y = fc.cursor_y - par.y;
 
@@ -18,8 +18,9 @@ ecs::system& sys_mouse_spring = ecs::add_system_parallel([](velocity& vel, parti
 	vel.y += force_y * fc.dt;
 });
 
+// A system that handles input events.
 // Take the 's' key for this system
-ecs::system& sys_toggle_mouse_spring = ecs::add_system([](input const& input) mutable {
+static ecs::system& sys_toggle_mouse_spring = ecs::add_system([](input const& input) mutable {
 	if (input.key != GLFW_KEY_S)
 		return;
 

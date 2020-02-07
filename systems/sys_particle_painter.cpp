@@ -5,7 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-ecs::system& sys_particle_painter = ecs::add_system_parallel([](particle& par, frame_context const& fc) {
+// Paint particles purple if they are in range of the cursor
+static ecs::system& sys_particle_painter = ecs::add_system_parallel([](particle& par, frame_context const& fc) {
 	float const r_x = fc.cursor_x - par.x;
 	float const r_y = fc.cursor_y - par.y;
 	float const len_sqr = r_x * r_x + r_y * r_y;
@@ -18,8 +19,9 @@ ecs::system& sys_particle_painter = ecs::add_system_parallel([](particle& par, f
 	par.b = 1;
 });
 
+// A system that handles input events.
 // Take the 'p' key for this system
-ecs::system& sys_toggle_particle_painter = ecs::add_system([](input const& input) mutable {
+static ecs::system const& sys_toggle_particle_painter = ecs::add_system([](input const& input) mutable {
 	if (input.key != GLFW_KEY_P)
 		return;
 
