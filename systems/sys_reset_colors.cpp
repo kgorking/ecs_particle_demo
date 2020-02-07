@@ -16,7 +16,6 @@ static ecs::system const& sys_reset_colors = ecs::add_system([](input const& inp
 
     std::cout << " reseting colors\n";
     auto const particles = ecs::get_components<particle>({ 0, max_num_particles });
-
     std::for_each(std::execution::par, particles.begin(), particles.end(), [](particle& p) {
         p.r = p.x / 2 + 0.5f;
         p.g = p.y / 2 + 0.5f;

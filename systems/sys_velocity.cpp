@@ -9,7 +9,7 @@
 
 // A system that takes an 'input' component.
 // Take the 'v' key for this system
-ecs::system& sys_vel_input = ecs::add_system([has_velocity = false] (input const& input) mutable {
+static ecs::system const& sys_vel_input = ecs::add_system([] (input const& input) {
     if (input.key != GLFW_KEY_V)
         return;
 
@@ -17,7 +17,7 @@ ecs::system& sys_vel_input = ecs::add_system([has_velocity = false] (input const
     // other systems that depend on the velocity component
     // will also stop running.
     ecs::entity_range particles{ 0, max_num_particles };
-    if (has_velocity) {
+    if (particles.has<velocity>()) {
         particles.remove<velocity>();
         std::cout << " removed velocity component\n";
     }
@@ -32,12 +32,10 @@ ecs::system& sys_vel_input = ecs::add_system([has_velocity = false] (input const
         });
         std::cout << " added velocity component\n";
     }
-
-    has_velocity = !has_velocity;
 });
 
 // Update a particles position from its velocity
-ecs::system& sys_velocity = ecs::add_system_parallel([](particle &par, velocity const& vel, frame_context const& fc) {
+static ecs::system const& sys_velocity = ecs::add_system_parallel([](particle &par, velocity const& vel, frame_context const& fc) {
     par.x += vel.x * fc.dt;
     par.y += vel.y * fc.dt;
 });

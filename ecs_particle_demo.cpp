@@ -19,7 +19,7 @@ static void print_help() {
 }
 
 static void error_callback(int error, const char* description) {
-	std::cout << "GLFW Error: " << description << '\n';
+	std::cout << "GLFW Error(" << error << "): " << description << '\n';
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -55,7 +55,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(800, 800, "ECS particle demo", NULL, NULL);
-	if (window) {
+	if (window != nullptr) {
 		glfwSetKeyCallback(window, key_callback);
 		glfwMakeContextCurrent(window);
         gladLoadGL(glfwGetProcAddress);
