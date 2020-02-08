@@ -1,10 +1,10 @@
-﻿#include <ecs/ecs.h>
+﻿#include <iostream>
+#include <ecs/ecs.h>
 
 #include <glad/gl.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "ecs_particle_demo.h"
 #include "components/input.h"
 #include "components/frame_context.h"
 
