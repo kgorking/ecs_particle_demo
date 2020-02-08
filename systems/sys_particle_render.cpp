@@ -2,27 +2,16 @@
 #include <glad/gl.h>
 
 #include "../components/particle.h"
+#include "../components/velocity.h"
 #include "../components/frame_context.h"
 #include "../shaders.h"
 #include "linmath.h"
 
-// Helper lambda to initialize a single particle
-auto constexpr particle_init = [](ecs::entity_id) -> particle {
-	float const x = rand() / 16384.0f - 1.0f;
-	float const y = rand() / 16384.0f - 1.0f;
-	float const r = x / 2 + 0.5f;
-	float const g = y / 2 + 0.5f;
-
-	return {
-		x, y,
-		r, g, 1 - r - g
-	};
-};
-
 // Create the particles
 static ecs::entity_range const particles{ 0, max_num_particles,
-	particle_init,  // initialize the particles using the lambda
-	frame_context{} // the static frame context. Only uses O(1) memory
+	particle_init,   // initialize the particles using the lambda
+	frame_context{}, // the static frame context. Only uses O(1) memory
+	velocity_init    // initialize the velocities using the lambda
 };
 
 // Component that holds the data for rendering particles
@@ -50,7 +39,7 @@ static ecs::system const& sys_particle_init = ecs::add_system([](render_init con
 
 	glGenBuffers(1, &pr.vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, pr.vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(particle) * max_num_particles, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(particle) * particles.count(), nullptr, GL_DYNAMIC_DRAW);
 
 	pr.vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(pr.vertex_shader, 1, &vertex_shader_text, NULL);
@@ -92,7 +81,7 @@ static ecs::system const& sys_particle_render = ecs::add_system(
 		mat4x4_mul(mvp, p, m);
 
 		// Copy the particle data
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * max_num_particles, particles.get<particle>().data());
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * particles.count(), particles.get<particle>().data());
 
 		// Draw the particles
 		glUseProgram(render.program);

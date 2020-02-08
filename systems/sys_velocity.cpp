@@ -23,13 +23,7 @@ static ecs::system const& sys_vel_input = ecs::add_system([] (input const& input
     }
     else {
         // Add a bunch of randomized velocities
-        particles.add([](ecs::entity_id) {
-            velocity v{ rand() / 16384.0f - 1.0f, rand() / 16384.0f - 1.0f };
-            float const len = sqrt(v.x * v.x + v.y * v.y) * 5;
-            v.x /= len;
-            v.y /= len;
-            return v;
-        });
+        particles.add(velocity_init);
         std::cout << " added velocity component\n";
     }
 });
