@@ -9,7 +9,7 @@
 
 // A system that takes an 'input' component.
 // Take the 'v' key for this system
-static ecs::system const& sys_vel_input = ecs::add_system([] (input const& input) {
+static ecs::system const& vel_input = ecs::add_system([] (input const& input) {
     if (input.key != GLFW_KEY_V)
         return;
 
@@ -29,7 +29,7 @@ static ecs::system const& sys_vel_input = ecs::add_system([] (input const& input
 });
 
 // Update a particles position from its velocity
-static ecs::system const& sys_velocity = ecs::add_system_parallel([](particle &par, velocity const& vel, frame_context const& fc) {
+static ecs::system const& apply_velocity = ecs::add_system_parallel([](particle &par, velocity const& vel, frame_context const& fc) {
     par.x += vel.x * fc.dt;
     par.y += vel.y * fc.dt;
 });

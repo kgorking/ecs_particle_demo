@@ -6,7 +6,7 @@
 #include <iostream>
 
 // Paint particles purple if they are in range of the cursor
-static ecs::system& sys_particle_painter = ecs::add_system_parallel([](particle& par, frame_context const& fc) {
+static ecs::system& particle_painter = ecs::add_system_parallel([](particle& par, frame_context const& fc) {
 	float const r_x = fc.cursor_x - par.x;
 	float const r_y = fc.cursor_y - par.y;
 	float const len_sqr = r_x * r_x + r_y * r_y;
@@ -21,10 +21,10 @@ static ecs::system& sys_particle_painter = ecs::add_system_parallel([](particle&
 
 // A system that handles input events.
 // Take the 'p' key for this system
-static ecs::system const& sys_toggle_particle_painter = ecs::add_system([](input const& input) mutable {
+static ecs::system const& toggle_particle_painter = ecs::add_system([](input const& input) mutable {
 	if (input.key != GLFW_KEY_P)
 		return;
 
-	sys_particle_painter.set_enable(!sys_particle_painter.is_enabled());
-	std::cout << " particle painter: " << (sys_particle_painter.is_enabled() ? "on\n" : "off\n");
+	particle_painter.set_enable(!particle_painter.is_enabled());
+	std::cout << " particle painter: " << (particle_painter.is_enabled() ? "on\n" : "off\n");
 });

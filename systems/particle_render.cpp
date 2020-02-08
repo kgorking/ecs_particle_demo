@@ -15,7 +15,7 @@ static ecs::entity_range const particles{ 0, max_num_particles,
 };
 
 // Component that holds the data for rendering particles
-struct particle_render {
+struct render_data {
 	GLuint vertex_buffer;
 	GLuint vertex_array;
 	GLuint vertex_shader;
@@ -34,8 +34,8 @@ struct render_init { ecs_flags(ecs::transient, ecs::tag); };
 static ecs::entity render{ -1, render_init{} };
 
 // System that sets up the buffers and shaders to render the particles
-static ecs::system const& sys_particle_init = ecs::add_system([](render_init const&) {
-	particle_render pr;
+static ecs::system const& particle_render_setup = ecs::add_system([](render_init const&) {
+	render_data pr;
 
 	glGenBuffers(1, &pr.vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, pr.vertex_buffer);
@@ -71,8 +71,7 @@ static ecs::system const& sys_particle_init = ecs::add_system([](render_init con
 });
 
 // The sytem that does the actual rendering
-static ecs::system const& sys_particle_render = ecs::add_system(
-	[](particle_render const& render, frame_context const& context) {
+static ecs::system const& particle_render = ecs::add_system([](render_data const& render, frame_context const& context) {
 		// Set up mvp matrix
 		mat4x4 m, p, mvp;
 		mat4x4_identity(m);
