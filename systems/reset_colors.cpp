@@ -9,7 +9,7 @@
 #include "../components/particle.h"
 
 // A system that handles input events.
-// Take the 'c' key for this system
+// Take the 'r' key for this system
 static ecs::system const& reset_colors = ecs::add_system([](input const& input) {
     if (input.key != GLFW_KEY_R)
         return;
