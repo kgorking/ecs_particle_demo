@@ -10,8 +10,8 @@
 // Create the particles
 static ecs::entity_range const particles{ 0, max_num_particles,
 	particle_init,   // initialize the particles using the lambda
-	frame_context{}, // the static frame context. Only uses O(1) memory
-	velocity_init    // initialize the velocities using the lambda
+	velocity_init,   // initialize the velocities using the lambda
+	frame_context{}  // the static frame context. Only uses O(1) memory
 };
 
 // Component that holds the data for rendering particles
