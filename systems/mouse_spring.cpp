@@ -7,7 +7,7 @@
 #include "../components/velocity.h"
 #include "../components/frame_context.h"
 
-static ecs::system& mouse_spring = ecs::add_system_parallel([](velocity& vel, particle const& par, frame_context const& fc) {
+static ecs::system& mouse_spring = ecs::make_parallel_system([](velocity& vel, particle const& par, frame_context const& fc) {
 	float const r_x = fc.cursor_x - par.x;
 	float const r_y = fc.cursor_y - par.y;
 
@@ -21,7 +21,7 @@ static ecs::system& mouse_spring = ecs::add_system_parallel([](velocity& vel, pa
 
 // A system that handles input events.
 // Take the 's' key for this system
-static ecs::system const& toggle_mouse_spring = ecs::add_system([](input const& input) {
+static ecs::system const& toggle_mouse_spring = ecs::make_system([](input const& input) {
 	if (input.key != GLFW_KEY_S)
 		return;
 
