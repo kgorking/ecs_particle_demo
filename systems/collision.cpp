@@ -4,7 +4,7 @@
 
 // Make sure the particles stay within the bounds.
 // This system is always active
-static ecs::system const& collision = ecs::make_parallel_system([](particle& par, velocity& vel) {
+static ecs::system_base const& collision = ecs::make_parallel_system([](particle& par, velocity& vel) {
 	if (par.x > 1) {
 		par.x = 1;
 		float const p = 2 * vel.x * -1;

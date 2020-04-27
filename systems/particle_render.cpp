@@ -34,7 +34,7 @@ struct render_init { ecs_flags(ecs::transient, ecs::tag); };
 static ecs::entity render{ -1, render_init{} };
 
 // System that sets up the buffers and shaders to render the particles
-static ecs::system const& particle_render_setup = ecs::make_system([](render_init) {
+static ecs::system_base const& particle_render_setup = ecs::make_system([](render_init) {
 	render_data pr;
 
 	glGenBuffers(1, &pr.vertex_buffer);
@@ -67,11 +67,11 @@ static ecs::system const& particle_render_setup = ecs::make_system([](render_ini
 
 	glPointSize(2);
 
-	render.add(pr, frame_context{});
+	render.add(render_data{ pr }, frame_context{});
 });
 
 // The sytem that does the actual rendering
-static ecs::system const& particle_render = ecs::make_system([](render_data const& render, frame_context const& context) {
+static ecs::system_base const& particle_render = ecs::make_system([](render_data const& render, frame_context const& context) {
 		// Set up mvp matrix
 		mat4x4 m, p, mvp;
 		mat4x4_identity(m);
