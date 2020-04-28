@@ -11,7 +11,7 @@ static ecs::system_base & particle_painter = ecs::make_parallel_system([](partic
 	float const r_y = fc.cursor_y - par.y;
 	float const len_sqr = r_x * r_x + r_y * r_y;
 
-	if (len_sqr > 0.005f)
+	if (len_sqr > 0.0005f)
 		return; // out of range
 
 	par.r = 1;

@@ -3,7 +3,7 @@
 
 // Contains per-frame data
 struct frame_context {
-	ecs_flags(ecs::share);
+	ecs_flags(ecs::global);
 
 	float time = 0;
 	float dt = 0;
