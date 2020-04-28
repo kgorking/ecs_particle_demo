@@ -67,11 +67,11 @@ static ecs::system_base const& particle_render_setup = ecs::make_system([](rende
 
 	glPointSize(2);
 
-	render.add(render_data{ pr }, frame_context{});
+	render.add(std::move(pr), frame_context{});
 });
 
 // The sytem that does the actual rendering
-static ecs::system_base const& particle_render = ecs::make_system([](render_data const& render, frame_context const& context) {
+static ecs::system_base const& particle_render = ecs::make_system([](render_data const& data, frame_context const& context) {
 		// Set up mvp matrix
 		mat4x4 m, p, mvp;
 		mat4x4_identity(m);
@@ -83,9 +83,9 @@ static ecs::system_base const& particle_render = ecs::make_system([](render_data
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * particles.count(), particles.get<particle>().data());
 
 		// Draw the particles
-		glUseProgram(render.program);
-		glUniformMatrix4fv(render.mvp_location, 1, GL_FALSE, &mvp[0][0]);
-		glBindVertexArray(render.vertex_array);
+		glUseProgram(data.program);
+		glUniformMatrix4fv(data.mvp_location, 1, GL_FALSE, &mvp[0][0]);
+		glBindVertexArray(data.vertex_array);
 		glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(ecs::get_component_count<particle>()));
 	}
 );
