@@ -1,6 +1,4 @@
-#pragma once
-
-static const char* vertex_shader_text =
+static constexpr char* vertex_shader_text =
 	"#version 330\n"
 	"uniform mat4 MVP;\n"
 	"in vec3 vCol;\n"
@@ -12,7 +10,7 @@ static const char* vertex_shader_text =
 	"    color = vCol;\n"
 	"}\n";
 
-static const char* fragment_shader_text =
+static constexpr char* fragment_shader_text =
 	"#version 330\n"
 	"in vec3 color;\n"
 	"out vec4 fragment;\n"

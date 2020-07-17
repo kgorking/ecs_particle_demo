@@ -1,11 +1,13 @@
 #pragma once
 #include <ecs/component_specifier.h>
 
+extern "C" double glfwGetTime(void);
+
 // Contains per-frame data
 struct frame_context {
 	ecs_flags(ecs::global);
 
-	float time = 0;
+	float time = static_cast<float>(glfwGetTime());
 	float dt = 0;
 
 	float cursor_x = 0.0;

@@ -2,12 +2,12 @@
 
 // Component that holds the data for rendering particles
 struct render_data {
-	unsigned int vertex_buffer;
-	unsigned int vertex_array;
-	unsigned int vertex_shader;
-	unsigned int fragment_shader;
-	unsigned int program;
-	int mvp_location;
-	int vpos_location;
-	int vcol_location;
+	unsigned int vertex_buffer = 0;
+	unsigned int vertex_array = 0;
+	unsigned int vertex_shader = 0;
+	unsigned int fragment_shader = 0;
+	unsigned int program = 0;
+	int mvp_location = 0;
+	int vpos_location = 0;
+	int vcol_location = 0;
 };
