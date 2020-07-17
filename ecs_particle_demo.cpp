@@ -76,7 +76,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwSetErrorCallback(error_callback);
 
-    // Create the window and add it to the engine entity
+    // Create the window and set it in the global component
 	GLFWwindow* window = glfwCreateWindow(800, 800, "ECS particle demo", NULL, NULL);
     if (window == nullptr) {
         std::cout << "glfw could not create a window.\n";
