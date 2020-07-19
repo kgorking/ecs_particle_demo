@@ -11,7 +11,7 @@ void setup_velocity() {
     // A system that takes an 'input' component.
     // Take the 'v' key for this system
     ecs::make_system([] (input const& input) {
-        if (input.key != GLFW_KEY_V)
+        if (!input.is_pressed(GLFW_KEY_V))
             return;
 
         // By removing the velocity components from the particles,

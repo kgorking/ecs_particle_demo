@@ -6,20 +6,22 @@
 
 #include "../components/input.h"
 #include "../components/particle.h"
+#include "../components/color.h"
 
 void setup_reset_colors() {
     // A system that handles input events.
     // Take the 'r' key for this system
     ecs::make_system([](input const& input) {
-        if (input.key != GLFW_KEY_R)
+        if (!input.is_pressed(GLFW_KEY_R))
             return;
 
         std::cout << " reseting colors\n";
         auto const particles = ecs::get_components<particle>({ 0, max_num_particles });
-        std::for_each(std::execution::par, particles.begin(), particles.end(), [](particle& p) {
-            p.r = p.x / 2 + 0.5f;
-            p.g = p.y / 2 + 0.5f;
-            p.b = 1 - p.r - p.g;
-        });
+        auto const colors = ecs::get_components<color>({ 0, max_num_particles });
+        for (int i = 0; i < max_num_particles; i++) {
+            colors[i].r = particles[i].x / 2 + 0.5f;
+            colors[i].g = particles[i].y / 2 + 0.5f;
+            colors[i].b = 1 - colors[i].r - colors[i].g;
+        }
     });
 }

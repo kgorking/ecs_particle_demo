@@ -14,7 +14,7 @@
 #include "components/tag_main.h"
 
 // The 'main' entity
-const ecs::entity engine{ -1, tag_main{} };
+const ecs::entity engine{ -1, tag_main{}, input{} };
 
 static void print_help() {
     std::cout << "\nOptions:\n";
@@ -45,7 +45,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     }
 
     // Allow systems to react to the input
-    engine.add(input{ window, key, scancode, action, mods });
+    //engine.add(input{ key, scancode, action, mods });
+    auto &i = engine.get<input>();
+    i.add(key, scancode, action, mods);
 }
 
 // Create the systems
@@ -59,6 +61,11 @@ void create_systems() {
     ECS_SETUP(particle_painter);
     ECS_SETUP(particle_render);
 #undef ECS_SETUP
+
+    // Clear input
+    ecs::make_system([](input &i) {
+        i.clear();
+    });
 }
 
 int main() {

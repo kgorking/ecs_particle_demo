@@ -23,7 +23,7 @@ add_subdirectory("ext/ecs")
 include_directories("ext/ecs/include")
 
 # Add source to this project's executable.
-add_executable (ecs_particle_demo "ecs_particle_demo.cpp" "ext/glfw/deps/glad_gl.c"   "systems/velocity.cpp" "systems/collision.cpp" "systems/reset_colors.cpp" "systems/mouse_spring.cpp" "systems/particle_painter.cpp" "systems/particle_render.cpp" "components/render_data.h" "systems/frame_context.cpp" "components/glfw_window.h" "components/tag_main.h")
+add_executable (ecs_particle_demo "ecs_particle_demo.cpp" "ext/glfw/deps/glad_gl.c"   "systems/velocity.cpp" "systems/collision.cpp" "systems/reset_colors.cpp" "systems/mouse_spring.cpp" "systems/particle_painter.cpp" "systems/particle_render.cpp" "components/render_data.h" "systems/frame_context.cpp" "components/glfw_window.h" "components/tag_main.h" "components/color.h")
 
 # TODO: Add tests and install targets if needed.
 target_link_libraries(ecs_particle_demo ecs glfw OpenGL::GL)

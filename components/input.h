@@ -1,12 +1,33 @@
 #pragma once
 #include <ecs/component_specifier.h>
+#include <vector>
 
-struct input {
-	ecs_flags(ecs::transient);
+class input {
+	ecs_flags(ecs::share);
 
-	struct GLFWwindow* window = nullptr;
-	int key = -1;
-	int scancode = 0;
-	int action = 0;
-	int mods = 0;
+	struct val {
+		int key;
+		int scancode;
+		int action;
+		int mods;
+	};
+	std::vector<val> values;
+
+public:
+	void add(int key, int scancode, int action, int mods) {
+		values.push_back(val{key, scancode, action, mods});
+	}
+
+	void clear() {
+		values.clear();
+	}
+
+	bool is_pressed(int key) const {
+		for (auto const& v : values) {
+			if (v.key == key)
+				return true;
+		}
+
+		return false;
+	}
 };

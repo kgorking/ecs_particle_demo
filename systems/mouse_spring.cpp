@@ -23,7 +23,7 @@ void setup_mouse_spring() {
 	// A system that handles input events.
 	// Take the 's' key for this system
 	ecs::make_system([&mouse_spring](input const& input) {
-		if (input.key != GLFW_KEY_S)
+		if (!input.is_pressed(GLFW_KEY_S))
 			return;
 
 		mouse_spring.set_enable(!mouse_spring.is_enabled());
