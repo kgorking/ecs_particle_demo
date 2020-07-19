@@ -2,6 +2,7 @@
 #include <glad/gl.h>
 
 #include "../components/particle.h"
+#include "../components/color.h"
 #include "../components/velocity.h"
 #include "../components/frame_context.h"
 #include "../components/render_data.h"
@@ -12,18 +13,20 @@ void setup_particle_render() {
 	// Create the particles
 	ecs::entity_range const particles{
 		0, max_num_particles,	// The range of particles
-		particle_init,			// initialize the particles using the lambda
-		velocity_init			// initialize the velocities using the lambda
+		particle_init,			// initialize the particles
+		color_init,	    		// initialize the colors
+		velocity_init			// initialize the velocities
 	};
 
     // Set up the buffers and shaders to render the particles.
     // This system is run when the main entity does not have 'render_data' attached.
-    // Put in group -1 so it runs before any attempts at rendering takes places.
-    ecs::make_system<-1>([particles](tag_main, render_data*) {
+    // Put in group -2 so it runs before any attempts at rendering takes places.
+    ecs::make_system<-2>([particles](tag_main, render_data*) {
         render_data pr;
+
         glGenBuffers(1, &pr.vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, pr.vertex_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(particle) * particles.count(), nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (sizeof(particle) + sizeof(color)) * particles.count(), nullptr, GL_DYNAMIC_DRAW);
 
 #include "../shaders.h"
 
@@ -47,9 +50,9 @@ void setup_particle_render() {
         glGenVertexArrays(1, &pr.vertex_array);
         glBindVertexArray(pr.vertex_array);
         glEnableVertexAttribArray(pr.vpos_location);
-        glVertexAttribPointer(pr.vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void const*>(offsetof(particle, x)));
+        glVertexAttribPointer(pr.vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(particle), 0);
         glEnableVertexAttribArray(pr.vcol_location);
-        glVertexAttribPointer(pr.vcol_location, 3, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void const*>(offsetof(particle, r)));
+        glVertexAttribPointer(pr.vcol_location, 3, GL_FLOAT, GL_FALSE, sizeof(color), (void*)(sizeof(particle) * particles.count()));
 
         glPointSize(2);
 
@@ -70,7 +73,8 @@ void setup_particle_render() {
 		mat4x4_mul(mvp, p, m);
 
 		// Copy the particle data
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * particles.count(), particles.get<particle>().data());
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(particle) * particles.count(), particles.get<particle>().data());
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(particle) * particles.count(), sizeof(color) * particles.count(), particles.get<color>().data());
 
 		// Draw the particles
 		glUseProgram(data.program);
